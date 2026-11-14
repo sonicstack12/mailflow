@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 
 import { corsOrigins, env } from "./config/env.js";
 import { connectDb } from "./db/pool.js";
+import { seedDirectoryDataIfEmpty } from "./db/seedDirectoryData.js";
 import { authRouter } from "./routes/auth.js";
 import { customerRouter } from "./routes/customer.js";
 import { adminRouter } from "./routes/admin.js";
@@ -15,6 +16,9 @@ import { startScheduler } from "./scheduler/scheduler.js";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { User, Profile, UserRole } from "./db/models.js";
+import { publicRouter } from "./routes/public.js";
+import { contentRouter } from "./routes/content.js";
+import { blockIfMaintenance } from "./middleware/platform.js";
 
 async function seedAdmin() {
   if (!env.ADMIN_EMAIL || !env.ADMIN_PASSWORD) return;
@@ -36,13 +40,14 @@ async function seedAdmin() {
   }
 }
 
-import { publicRouter } from "./routes/public.js";
-import { contentRouter } from "./routes/content.js";
-import { blockIfMaintenance } from "./middleware/platform.js";
-
 async function main() {
   await connectDb();
   await seedAdmin();
+  try {
+    await seedDirectoryDataIfEmpty();
+  } catch (err) {
+    console.error("[db] directory seed failed (companies/HR may be empty):", err);
+  }
 
   const app = express();
 
