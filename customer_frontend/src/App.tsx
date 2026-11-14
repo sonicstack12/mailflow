@@ -50,9 +50,9 @@ const App = () => (
                 <Route path="hr-lists" element={<HrLists />} />
                 <Route path="logs" element={<Logs />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

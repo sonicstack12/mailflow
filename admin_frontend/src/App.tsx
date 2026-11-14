@@ -36,9 +36,9 @@ const App = () => (
               <Route path="analytics" element={<AdminAnalytics />} />
               <Route path="activities" element={<AdminActivities />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
