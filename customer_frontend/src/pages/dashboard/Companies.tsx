@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { apiFetch, logActivity } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 
 interface CompanyRow {
   id: string;
@@ -100,7 +100,6 @@ const Companies = () => {
   const [priority, setPriority] = useState("all");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<CompanyRow | null>(null);
-  const [applyTarget, setApplyTarget] = useState<CompanyRow | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), 300);
@@ -148,39 +147,6 @@ const Companies = () => {
     if (value.startsWith("A")) return "bg-yellow-100 text-yellow-800 border-0";
     if (value.startsWith("B")) return "bg-slate-100 text-slate-700 border-0";
     return "bg-slate-50 text-slate-500 border-0";
-  };
-
-  const openApply = (company: CompanyRow) => {
-    if (!isPremium) {
-      toast({
-        title: "Premium feature",
-        description: "Upgrade to premium to apply using the full company directory.",
-      });
-      return;
-    }
-    if (!company.careers_link) {
-      toast({
-        title: "No careers link",
-        description: "This company does not have a careers URL yet. Please search manually and verify.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setApplyTarget(company);
-  };
-
-  const confirmApply = async () => {
-    if (!applyTarget?.careers_link) return;
-    await logActivity("Company apply click", {
-      company_id: applyTarget.id,
-      company_name: applyTarget.name,
-    });
-    window.open(applyTarget.careers_link, "_blank", "noopener,noreferrer");
-    setApplyTarget(null);
-    toast({
-      title: "Opened careers page",
-      description: "Re-verify openings and eligibility on the company site before applying.",
-    });
   };
 
   const visibleLockedHint = useMemo(() => {
@@ -232,8 +198,8 @@ const Companies = () => {
               </CardTitle>
               <CardDescription className="text-slate-500">
                 {isPremium
-                  ? "Search, filter, and open careers pages after re-verifying details."
-                  : "Preview the first 5 companies. Upgrade to premium for the full directory and Apply access."}
+                  ? "Search and filter the full employer directory after re-verifying details."
+                  : "Preview the first 5 companies. Upgrade to premium for the full directory."}
               </CardDescription>
             </div>
           </div>
@@ -321,34 +287,14 @@ const Companies = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="inline-flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-slate-500 hover:text-yellow-700 hover:bg-yellow-50"
-                              onClick={() => setSelected(company)}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="h-8 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
-                              onClick={() => openApply(company)}
-                              disabled={!isPremium}
-                            >
-                              {isPremium ? (
-                                <>
-                                  Apply
-                                  <ExternalLink className="w-3.5 h-3.5 ml-1" />
-                                </>
-                              ) : (
-                                <>
-                                  <Lock className="w-3.5 h-3.5 mr-1" />
-                                  Apply
-                                </>
-                              )}
-                            </Button>
-                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-500 hover:text-yellow-700 hover:bg-yellow-50"
+                            onClick={() => setSelected(company)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -461,41 +407,17 @@ const Companies = () => {
                 <ExternalLink className="w-4 h-4 ml-1" />
               </Button>
             )}
-            <Button
-              className="rounded-xl bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
-              disabled={!isPremium}
-              onClick={() => selected && openApply(selected)}
-            >
-              {isPremium ? "Apply via careers page" : "Premium required to apply"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!applyTarget} onOpenChange={(open) => !open && setApplyTarget(null)}>
-        <DialogContent className="max-w-lg rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-navy-900">Re-verify before applying</DialogTitle>
-            <DialogDescription className="text-slate-500">
-              You are about to open the careers page for <strong>{applyTarget?.name}</strong>.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 text-sm text-amber-950 leading-relaxed">
-            Please re-verify the job opening, fresher eligibility, location, salary, and official domain
-            before submitting any personal information. MailFlow provides this directory for research
-            assistance only and is not liable for hiring outcomes or outdated company data.
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" className="rounded-xl" onClick={() => setApplyTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              className="rounded-xl bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
-              onClick={confirmApply}
-            >
-              I understand — open careers
-              <ExternalLink className="w-4 h-4 ml-1" />
-            </Button>
+            {selected?.careers_link && (
+              <Button
+                className="rounded-xl bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
+                onClick={() =>
+                  window.open(selected.careers_link, "_blank", "noopener,noreferrer")
+                }
+              >
+                Careers page
+                <ExternalLink className="w-4 h-4 ml-1" />
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

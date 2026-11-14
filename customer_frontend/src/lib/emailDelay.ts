@@ -80,6 +80,40 @@ export function formatDelayTime(seconds: number): string {
   return `${minutes}m ${remainingSeconds}s`;
 }
 
+/** Human-readable duration for multi-hour/day campaign estimates. */
+export function formatCampaignDuration(seconds: number): string {
+  const totalMinutes = Math.max(1, Math.round(seconds / 60));
+  if (totalMinutes < 60) return `~${totalMinutes}m`;
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours < 24) {
+    return minutes > 0 ? `~${hours}h ${minutes}m` : `~${hours}h`;
+  }
+
+  const days = Math.floor(hours / 24);
+  const remHours = hours % 24;
+  return remHours > 0 ? `~${days}d ${remHours}h` : `~${days}d`;
+}
+
+/**
+ * Estimated total send window for a campaign using smart-delay ranges.
+ * Returns null when count is 100 or below (UI should hide the estimate).
+ */
+export function estimateCampaignDuration(totalEmails: number): string | null {
+  if (totalEmails <= 100) return null;
+
+  const range = getDelayRangeForCount(totalEmails);
+  const gaps = Math.max(totalEmails - 1, 0);
+
+  // Human pause every ~20 emails adds roughly 20–40 minutes
+  const pauseCount = Math.floor(gaps / 20);
+  const minSec = gaps * range.minDelay + pauseCount * 1200;
+  const maxSec = gaps * range.maxDelay + pauseCount * 2400;
+
+  return `${formatCampaignDuration(minSec)} – ${formatCampaignDuration(maxSec)}`;
+}
+
 // Constants for email limits
 export const EMAIL_LIMITS = {
   FREE_DAILY_LIMIT: 250,

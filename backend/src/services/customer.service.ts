@@ -523,7 +523,7 @@ export class CustomerService {
         const contacts = rows.map((c) => ({
             id: c._id,
             name: c.name,
-            email: c.email,
+            email: premium ? c.email : null,
             title: c.title,
             company: c.company,
             sort_order: c.sort_order,
@@ -565,7 +565,7 @@ export class CustomerService {
         return {
             id: contact._id,
             name: contact.name,
-            email: contact.email,
+            email: premium ? contact.email : null,
             title: contact.title,
             company: contact.company,
             sort_order: contact.sort_order,

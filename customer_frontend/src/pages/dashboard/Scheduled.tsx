@@ -37,6 +37,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { parseExcelFile, checkVariableSync, type RecipientData } from "@/lib/excelParser";
+import { estimateCampaignDuration } from "@/lib/emailDelay";
 import { apiFetch } from "@/lib/api";
 
 interface ScheduledEmail {
@@ -525,6 +526,17 @@ const Scheduled = () => {
                         <Badge className="bg-slate-100 text-slate-600 border-0 font-medium">{email.timezone}</Badge>
                       </div>
                     </div>
+                    {email.recipient_count > 100 && estimateCampaignDuration(email.recipient_count) && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-50 border border-yellow-100 text-sm text-navy-800">
+                        <Clock className="w-4 h-4 text-yellow-600" />
+                        <span>
+                          Est. total send time:{" "}
+                          <span className="font-semibold">
+                            {estimateCampaignDuration(email.recipient_count)}
+                          </span>
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-end gap-3 flex-shrink-0">

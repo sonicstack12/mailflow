@@ -46,7 +46,7 @@ import { apiFetch, logActivity } from "@/lib/api";
 interface HrContactRow {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   title: string;
   company: string;
   sort_order: number;
@@ -123,10 +123,10 @@ const HrLists = () => {
   const disclaimer = data?.disclaimer || DEFAULT_DISCLAIMER;
 
   const openEmail = (contact: HrContactRow) => {
-    if (!isPremium) {
+    if (!isPremium || !contact.email) {
       toast({
         title: "Premium feature",
-        description: "Upgrade to premium to email HRs from this directory.",
+        description: "Upgrade to premium to view emails and contact HRs.",
       });
       return;
     }
@@ -152,7 +152,8 @@ const HrLists = () => {
     });
   };
 
-  const copyEmail = async (email: string) => {
+  const copyEmail = async (email: string | null) => {
+    if (!email) return;
     try {
       await navigator.clipboard.writeText(email);
       toast({ title: "Copied", description: email });
@@ -211,7 +212,7 @@ const HrLists = () => {
               <CardDescription className="text-slate-500">
                 {isPremium
                   ? "Search, filter, and email HR contacts after re-verifying details."
-                  : "Preview the first 5 HR contacts. Upgrade to premium for the full list and email access."}
+                  : "Preview the first 5 HR contacts. Upgrade to premium to unlock emails and the full list."}
               </CardDescription>
             </div>
           </div>
@@ -266,9 +267,9 @@ const HrLists = () => {
                           <div className="font-semibold text-navy-900">{contact.name}</div>
                         </TableCell>
                         <TableCell className="text-sm text-slate-600">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate max-w-[200px]">{contact.email}</span>
-                            {isPremium && (
+                          {isPremium && contact.email ? (
+                            <div className="flex items-center gap-1">
+                              <span className="truncate max-w-[200px]">{contact.email}</span>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -277,8 +278,13 @@ const HrLists = () => {
                               >
                                 <Copy className="w-3.5 h-3.5" />
                               </Button>
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 text-slate-400">
+                              <Lock className="w-3.5 h-3.5" />
+                              Premium only
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="text-sm text-slate-600 max-w-[240px]">
                           <span className="line-clamp-2">{contact.title || "—"}</span>
@@ -296,24 +302,16 @@ const HrLists = () => {
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button
-                              size="sm"
-                              className="h-8 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
-                              onClick={() => openEmail(contact)}
-                              disabled={!isPremium}
-                            >
-                              {isPremium ? (
-                                <>
-                                  <Mail className="w-3.5 h-3.5 mr-1" />
-                                  Email
-                                </>
-                              ) : (
-                                <>
-                                  <Lock className="w-3.5 h-3.5 mr-1" />
-                                  Email
-                                </>
-                              )}
-                            </Button>
+                            {isPremium && (
+                              <Button
+                                size="sm"
+                                className="h-8 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
+                                onClick={() => openEmail(contact)}
+                              >
+                                <Mail className="w-3.5 h-3.5 mr-1" />
+                                Email
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -388,16 +386,20 @@ const HrLists = () => {
           </DialogHeader>
           {selected && (
             <div className="space-y-4 text-sm">
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-100 text-amber-900">
-                {disclaimer}
-              </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Company</p>
                 <p className="text-slate-700">{selected.company || "—"}</p>
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Email</p>
-                <p className="text-slate-700 break-all">{selected.email}</p>
+                {isPremium && selected.email ? (
+                  <p className="text-slate-700 break-all">{selected.email}</p>
+                ) : (
+                  <p className="inline-flex items-center gap-1.5 text-slate-400">
+                    <Lock className="w-3.5 h-3.5" />
+                    Upgrade to premium to view email
+                  </p>
+                )}
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Title</p>
@@ -406,23 +408,24 @@ const HrLists = () => {
             </div>
           )}
           <DialogFooter className="gap-2">
-            {selected && isPremium && (
-              <Button
-                variant="outline"
-                className="rounded-xl"
-                onClick={() => copyEmail(selected.email)}
-              >
-                <Copy className="w-4 h-4 mr-1" />
-                Copy email
-              </Button>
+            {selected && isPremium && selected.email && (
+              <>
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={() => copyEmail(selected.email)}
+                >
+                  <Copy className="w-4 h-4 mr-1" />
+                  Copy email
+                </Button>
+                <Button
+                  className="rounded-xl bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
+                  onClick={() => openEmail(selected)}
+                >
+                  Email this HR
+                </Button>
+              </>
             )}
-            <Button
-              className="rounded-xl bg-yellow-400 hover:bg-yellow-500 text-navy-900 font-semibold"
-              disabled={!isPremium}
-              onClick={() => selected && openEmail(selected)}
-            >
-              {isPremium ? "Email this HR" : "Premium required to email"}
-            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
