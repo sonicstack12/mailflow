@@ -1,0 +1,196 @@
+{
+  "features": [
+    {
+      "icon": "Server",
+      "title": "SMTP Integration",
+      "description": "Connect Gmail, Outlook, AWS SES, or any custom SMTP. Full control over delivery.",
+      "order": 0,
+      "isActive": true
+    },
+    {
+      "icon": "FileText",
+      "title": "Template Builder",
+      "description": "Create rich HTML templates with dynamic variables like {{name}}, {{company}}. Real-time preview.",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "icon": "Upload",
+      "title": "Excel Data Sync",
+      "description": "Upload Excel files with recipient data. Automatic column-to-variable mapping with validation.",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "icon": "Clock",
+      "title": "Smart Scheduling",
+      "description": "Schedule emails for any timezone. Works offline - emails send even when you're away.",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "icon": "BarChart3",
+      "title": "Live Dashboard",
+      "description": "Real-time analytics with delivery rates, failures, and activity logs. Export to CSV anytime.",
+      "order": 4,
+      "isActive": true
+    },
+    {
+      "icon": "Shield",
+      "title": "Smart Delivery",
+      "description": "Intelligent delays based on campaign size to maximize deliverability and avoid spam filters.",
+      "order": 5,
+      "isActive": true
+    }
+  ],
+  "benefits": [
+    {
+      "icon": "Globe",
+      "title": "Multi-Timezone Support",
+      "description": "Schedule for recipients in different timezones. Emails arrive at the perfect local time.",
+      "order": 0,
+      "isActive": true
+    },
+    {
+      "icon": "Lock",
+      "title": "Encrypted Credentials",
+      "description": "SMTP passwords are encrypted. Your data never leaves your control.",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "icon": "Rocket",
+      "title": "High Throughput",
+      "description": "Send thousands of emails with intelligent delays to maximize deliverability.",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "icon": "Target",
+      "title": "Variable Validation",
+      "description": "Real-time validation ensures Excel columns match your template variables before sending.",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "icon": "RefreshCw",
+      "title": "Activity Logging",
+      "description": "Detailed logs of every email sent, failed, or scheduled. Filter and export anytime.",
+      "order": 4,
+      "isActive": true
+    },
+    {
+      "icon": "CheckCircle",
+      "title": "SMTP Guides",
+      "description": "Step-by-step setup guides for Gmail, Outlook, AWS SES, and more.",
+      "order": 5,
+      "isActive": true
+    }
+  ],
+  "steps": [
+    {
+      "number": "01",
+      "title": "Configure SMTP",
+      "description": "Add your SMTP server credentials securely. We support all major providers.",
+      "icon": "Server",
+      "order": 0,
+      "isActive": true
+    },
+    {
+      "number": "02",
+      "title": "Create Template",
+      "description": "Design your email with our rich text editor. Add dynamic variables easily.",
+      "icon": "FileText",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "number": "03",
+      "title": "Upload Recipients",
+      "description": "Import from Excel or enter manually. Variables sync automatically with columns.",
+      "icon": "Upload",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "number": "04",
+      "title": "Send or Schedule",
+      "description": "Send immediately or pick a future time. Emails go out even if you're offline.",
+      "icon": "Clock",
+      "order": 3,
+      "isActive": true
+    }
+  ],
+  "useCases": [
+    {
+      "title": "HR Teams",
+      "description": "Send onboarding emails, policy updates, and company announcements to all employees.",
+      "icon": "Users",
+      "order": 0,
+      "isActive": true
+    },
+    {
+      "title": "Sales Teams",
+      "description": "Personalized outreach campaigns to prospects with dynamic company and name fields.",
+      "icon": "Target",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "title": "Marketing",
+      "description": "Newsletter campaigns, product launches, and promotional emails at scale.",
+      "icon": "Rocket",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "title": "Recruiters",
+      "description": "Bulk interview invites, follow-ups, and offer letters with candidate details.",
+      "icon": "Mail",
+      "order": 3,
+      "isActive": true
+    }
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free",
+      "icon": "Gift",
+      "description": "Try MailFlow for 1 month",
+      "monthlyPrice": 0,
+      "yearlyPrice": 0,
+      "features": [
+        "Free for 1 month",
+        "Max 250 emails/day",
+        "Logs stored for 24 hours",
+        "All templates included",
+        "Excel upload support",
+        "Basic email scheduling"
+      ],
+      "cta": "Start Free Trial",
+      "popular": false,
+      "highlight": null,
+      "order": 0,
+      "isActive": true
+    },
+    {
+      "name": "Premium",
+      "icon": "Sparkles",
+      "description": "For power users & teams",
+      "monthlyPrice": 250,
+      "yearlyPrice": 2100,
+      "features": [
+        "Unlimited emails",
+        "Logs stored for 7 days",
+        "Priority email delivery",
+        "All templates included",
+        "All SMTP providers",
+        "Priority support"
+      ],
+      "cta": "Upgrade to Premium",
+      "popular": true,
+      "highlight": null,
+      "order": 1,
+      "isActive": true
+    }
+  ]
+}

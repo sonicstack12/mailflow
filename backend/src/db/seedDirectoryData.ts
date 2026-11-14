@@ -2,7 +2,16 @@ import { existsSync, readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { v4 as uuidv4 } from "uuid";
-import { Company, HrContact, PlatformSetting } from "./models.js";
+import {
+  Benefit,
+  Company,
+  Feature,
+  HrContact,
+  PlatformSetting,
+  PricingPlan,
+  Step,
+  UseCase,
+} from "./models.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -170,9 +179,82 @@ export async function ensurePlatformSettings() {
   }
 }
 
+/** Idempotent: seeds landing-page CMS content when Feature collection is empty. */
+export async function seedSiteContentIfEmpty() {
+  const count = await Feature.countDocuments();
+  if (count > 0) {
+    console.log(`[db] site content already present (${count} features), skip seed`);
+    return;
+  }
+
+  const raw = readFileSync(resolveDataFile("site-content.json"), "utf-8");
+  const data = JSON.parse(raw) as {
+    features?: Array<{ icon: string; title: string; description: string; order?: number; isActive?: boolean }>;
+    benefits?: Array<{ icon: string; title: string; description: string; order?: number; isActive?: boolean }>;
+    steps?: Array<{ number: string; title: string; description: string; icon: string; order?: number; isActive?: boolean }>;
+    useCases?: Array<{ title: string; description: string; icon: string; order?: number; isActive?: boolean }>;
+    pricingPlans?: Array<{
+      name: string;
+      icon: string;
+      description: string;
+      monthlyPrice: number;
+      yearlyPrice: number;
+      features: string[];
+      cta: string;
+      popular?: boolean;
+      highlight?: string | null;
+      order?: number;
+      isActive?: boolean;
+    }>;
+  };
+
+  if (data.features?.length) {
+    await Feature.insertMany(
+      data.features.map((row) => ({ _id: uuidv4(), isActive: true, order: 0, ...row })),
+      { ordered: false }
+    );
+  }
+  if (data.benefits?.length) {
+    await Benefit.insertMany(
+      data.benefits.map((row) => ({ _id: uuidv4(), isActive: true, order: 0, ...row })),
+      { ordered: false }
+    );
+  }
+  if (data.steps?.length) {
+    await Step.insertMany(
+      data.steps.map((row) => ({ _id: uuidv4(), isActive: true, order: 0, ...row })),
+      { ordered: false }
+    );
+  }
+  if (data.useCases?.length) {
+    await UseCase.insertMany(
+      data.useCases.map((row) => ({ _id: uuidv4(), isActive: true, order: 0, ...row })),
+      { ordered: false }
+    );
+  }
+  if (data.pricingPlans?.length) {
+    await PricingPlan.insertMany(
+      data.pricingPlans.map((row) => ({
+        _id: uuidv4(),
+        isActive: true,
+        order: 0,
+        popular: false,
+        highlight: null,
+        ...row,
+      })),
+      { ordered: false }
+    );
+  }
+
+  console.log(
+    `[db] seeded site content (features=${data.features?.length ?? 0}, benefits=${data.benefits?.length ?? 0}, steps=${data.steps?.length ?? 0}, useCases=${data.useCases?.length ?? 0}, pricing=${data.pricingPlans?.length ?? 0})`
+  );
+}
+
 /** Safe for every boot — skips when data already exists (no Render Shell needed). */
 export async function seedDirectoryDataIfEmpty() {
   await ensurePlatformSettings();
+  await seedSiteContentIfEmpty();
   await seedCompaniesIfEmpty();
   await seedHrContactsIfEmpty();
 }
