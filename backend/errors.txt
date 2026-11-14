@@ -1,0 +1,5 @@
+﻿src/db/pool.ts(27,9): error TS18048: 'mongoose.connection.db' is possibly 'undefined'.
+src/scheduler/scheduler.ts(39,35): error TS2345: Argument of type '{ status: string; _id: string; name: string; user_id: string; recipients: any; recipient_count: number; scheduled_time: NativeDate; timezone: string; emails_sent: number; emails_failed: number; template_id?: string | ... 1 more ... | undefined; smtp_config_id?: string | ... 1 more ... | undefined; __v: number; }' is not assignable to parameter of type 'ScheduledJob'.
+  Types of property 'template_id' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /#how-it-works
+Allow: /#features
+Allow: /#pricing
+Disallow: /dashboard/
+
+Sitemap: https://mailflow-domain-placeholder.com/sitemap.xml
