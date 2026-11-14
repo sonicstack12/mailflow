@@ -1,17 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { AuthService } from "../services/auth.service.js";
-import { env } from "../config/env.js";
-
-function setAuthCookie(res: Response, token: string) {
-    res.cookie("access_token", token, {
-        httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-}
+import { clearAuthCookie, setAuthCookie } from "../auth/cookies.js";
 
 export class AuthController {
     static async signup(req: Request, res: Response) {
@@ -25,7 +15,8 @@ export class AuthController {
 
             const token = await AuthService.signup(body);
             setAuthCookie(res, token);
-            res.json({ ok: true });
+            // token also returned for cross-origin SPAs where cookies may be blocked
+            res.json({ ok: true, token });
         } catch (e: any) {
             if (e.message === "Email already exists") {
                 res.status(409).json({ error: e.message });
@@ -45,14 +36,14 @@ export class AuthController {
 
             const token = await AuthService.login(body);
             setAuthCookie(res, token);
-            res.json({ ok: true });
+            res.json({ ok: true, token });
         } catch (e: any) {
             res.status(401).json({ error: e.message || "Unauthorized" });
         }
     }
 
     static async logout(_req: Request, res: Response) {
-        res.clearCookie("access_token", { path: "/" });
+        clearAuthCookie(res);
         res.json({ ok: true });
     }
 

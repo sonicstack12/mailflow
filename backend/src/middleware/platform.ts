@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { PlatformSetting } from "../db/models.js";
 import { verifyAccessToken } from "../auth/jwt.js";
-import type { AuthedRequest } from "./auth.js";
+import { extractAccessToken, type AuthedRequest } from "./auth.js";
 
 async function getSettingFlag(key: string, fallback = "false") {
   const doc = await PlatformSetting.findOne({ key }).lean();
@@ -48,7 +48,7 @@ export async function blockIfMaintenance(req: AuthedRequest, res: Response, next
     if (!maintenance) return next();
 
     // Admins may continue using customer APIs during maintenance
-    const token = req.cookies?.access_token as string | undefined;
+    const token = extractAccessToken(req);
     if (token) {
       try {
         const auth = verifyAccessToken(token);

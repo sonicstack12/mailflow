@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, setAccessToken } from "@/lib/api";
 
 export interface Profile {
   user_id: string;
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(data.user);
       setProfile(data.profile);
     } catch {
+      setAccessToken(null);
       setUser(null);
       setProfile(null);
     }
@@ -53,10 +54,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      await apiFetch<{ ok: true }>("/api/auth/signup", {
+      const data = await apiFetch<{ ok: true; token?: string }>("/api/auth/signup", {
         method: "POST",
         body: JSON.stringify({ email, password, fullName }),
       });
+      if (data.token) setAccessToken(data.token);
       await refreshProfile();
       return { error: null };
     } catch (e: unknown) {
@@ -66,10 +68,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      await apiFetch<{ ok: true }>("/api/auth/login", {
+      const data = await apiFetch<{ ok: true; token?: string }>("/api/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
+      if (data.token) setAccessToken(data.token);
       await refreshProfile();
       return { error: null };
     } catch (e: unknown) {
@@ -78,12 +81,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-
     try {
       await apiFetch<{ ok: true }>("/api/auth/logout", { method: "POST", body: JSON.stringify({}) });
     } catch {
       // Backend may not be running — that's ok
     } finally {
+      setAccessToken(null);
       setUser(null);
       setProfile(null);
     }

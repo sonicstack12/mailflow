@@ -8,8 +8,20 @@ declare global {
 
 export type AuthedRequest = Request & { auth?: JwtUser };
 
+export function extractAccessToken(req: Request): string | undefined {
+  const cookieToken = req.cookies?.access_token as string | undefined;
+  if (cookieToken) return cookieToken;
+
+  const header = req.headers.authorization;
+  if (header?.startsWith("Bearer ")) {
+    const bearer = header.slice(7).trim();
+    if (bearer) return bearer;
+  }
+  return undefined;
+}
+
 export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
-  const token = req.cookies?.access_token as string | undefined;
+  const token = extractAccessToken(req);
   if (!token) {
     return res.status(401).json({ error: "Unauthorized" });
   }

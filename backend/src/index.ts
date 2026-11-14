@@ -47,6 +47,8 @@ async function main() {
   const app = express();
 
   app.disable("x-powered-by");
+  // Render (and other proxies) terminate TLS; needed for correct secure cookies / IPs
+  app.set("trust proxy", 1);
   app.use(helmet());
   app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
 
@@ -56,7 +58,7 @@ async function main() {
         // allow non-browser tools (no origin)
         if (!origin) return cb(null, true);
         if (corsOrigins.includes(origin)) return cb(null, true);
-        return cb(new Error("CORS blocked"), false);
+        return cb(null, false);
       },
       credentials: true,
     })
